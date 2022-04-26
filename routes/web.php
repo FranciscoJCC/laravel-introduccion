@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
-
-use App\Http\Controllers\UserController;
+use Inertia\Inertia;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,16 +14,18 @@ use App\Http\Controllers\UserController;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/home', function(){
-    return view('home');
-});
-Route::get('/', [UserController::class, 'index']);
-/* Route::get('/', [UserController::class, 'index'])->middleware('auth'); */
-Route::post('/users', [UserController::class, 'store'])->name('users.store');
-Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
-/* 
-Route::resource('users', UserController::class)->names([
-    'create' => 'users.build'
-])->middleware('auth');
-*/
+Route::get('/', function () {
+    return Inertia::render('Welcome', [
+        'canLogin' => Route::has('login'),
+        'canRegister' => Route::has('register'),
+        'laravelVersion' => Application::VERSION,
+        'phpVersion' => PHP_VERSION,
+    ]);
+});
+
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+require __DIR__.'/auth.php';
